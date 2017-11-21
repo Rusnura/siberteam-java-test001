@@ -2,6 +2,8 @@ package workers;
 
 import org.apache.log4j.Logger;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
@@ -31,6 +33,11 @@ public class ExecutorWorker {
     }
 
     public void start() throws Exception {
+        File file = new File(filePath);
+        if (!file.canRead()) {
+            throw new IOException("Can't opening file for reading!");
+        }
+
         final Producer producer = new Producer(this.queueOfSymbols, this.filePath);
         final Consumer consumer = new Consumer(this.queueOfSymbols, this.countOfCharsMap);
         final List<Future<AtomicInteger>> workerList = new ArrayList<Future<AtomicInteger>>();

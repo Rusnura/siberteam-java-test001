@@ -1,14 +1,11 @@
 package workers;
 
-import org.apache.log4j.Logger;
-
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Consumer implements Callable<AtomicInteger> {
-    private static final Logger log = Logger.getLogger(Consumer.class);
     private final BlockingQueue<String> queueOfSymbols;
     private final ConcurrentHashMap<Character, AtomicInteger> countOfCharsMap;
     private AtomicInteger symbolsCount = new AtomicInteger(0);
