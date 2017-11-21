@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class DrawerWorker {
     public static void draw(ConcurrentHashMap<Character, AtomicInteger> countOfCharsMap, long symbolsCount) {
         try {
-            TreeMap<Character, AtomicInteger> sortedHashMap = new TreeMap<Character, AtomicInteger>(countOfCharsMap);
+            final TreeMap<Character, AtomicInteger> sortedHashMap = new TreeMap<Character, AtomicInteger>(countOfCharsMap);
             // Loop gets entry from map
             for (Map.Entry<Character, AtomicInteger> entry : sortedHashMap.entrySet()) {
                 char symbol = entry.getKey();

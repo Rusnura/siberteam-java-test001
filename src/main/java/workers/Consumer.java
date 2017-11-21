@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Consumer implements Callable<AtomicInteger> {
     private final BlockingQueue<String> queueOfSymbols;
-    private ConcurrentHashMap<Character, AtomicInteger> countOfCharsMap;
+    private final ConcurrentHashMap<Character, AtomicInteger> countOfCharsMap;
     private AtomicInteger symbolsCount = new AtomicInteger(0);
 
     public Consumer(BlockingQueue<String> q, ConcurrentHashMap<Character, AtomicInteger> countOfCharsMap) {
@@ -15,6 +15,7 @@ public class Consumer implements Callable<AtomicInteger> {
         this.countOfCharsMap = countOfCharsMap;
     }
 
+    @Override
     public AtomicInteger call() throws Exception {
         try {
             String line;
@@ -36,7 +37,7 @@ public class Consumer implements Callable<AtomicInteger> {
                         value.incrementAndGet();
                     }
                 }
-                symbolsCount.getAndAdd(line.length());
+                symbolsCount.addAndGet(line.length());
             }
             return symbolsCount;
         } catch (InterruptedException e) {
