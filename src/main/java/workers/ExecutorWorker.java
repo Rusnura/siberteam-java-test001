@@ -1,7 +1,5 @@
 package workers;
 
-import org.apache.log4j.Logger;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,7 +8,6 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ExecutorWorker {
-    private static final Logger log = Logger.getLogger(ExecutorWorker.class);
     public static int availableProcessors = Runtime.getRuntime().availableProcessors();
     public static final String POISON_PILL = new String(); // Add it to queue end
     private final BlockingQueue<String> queueOfSymbols = new ArrayBlockingQueue<String>(10);
