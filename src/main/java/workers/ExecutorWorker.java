@@ -1,12 +1,14 @@
 package workers;
 
-import java.io.IOException;
+import org.apache.log4j.Logger;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ExecutorWorker {
+    private static final Logger log = Logger.getLogger(ExecutorWorker.class);
     public static int availableProcessors = Runtime.getRuntime().availableProcessors();
     public static final String POISON_PILL = new String(); // Add it to queue end
     private final BlockingQueue<String> queueOfSymbols = new ArrayBlockingQueue<String>(10);
@@ -28,7 +30,7 @@ public class ExecutorWorker {
         return countOfCharsMap;
     }
 
-    public void start() throws IOException {
+    public void start() throws Exception {
         final Producer producer = new Producer(this.queueOfSymbols, this.filePath);
         final Consumer consumer = new Consumer(this.queueOfSymbols, this.countOfCharsMap);
         final List<Future<AtomicInteger>> workerList = new ArrayList<Future<AtomicInteger>>();
@@ -42,8 +44,6 @@ public class ExecutorWorker {
         for (Future<AtomicInteger> future: workerList) {
             try {
                  symbolsCount = future.get();
-            } catch (Exception e) {
-                System.err.println(e.getMessage());
             } finally {
                 readerService.shutdown();
                 symbolsAnalyzer.shutdown();

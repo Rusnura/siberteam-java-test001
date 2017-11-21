@@ -1,11 +1,13 @@
 package workers;
 
+import org.apache.log4j.Logger;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 
 public class Producer implements Runnable {
+    private static final Logger log = Logger.getLogger(Producer.class);
     private final BlockingQueue<String> queueOfSymbols;
     private final String filePath;
     private BufferedReader bufferedReader;
@@ -25,10 +27,8 @@ public class Producer implements Runnable {
             while ((line = bufferedReader.readLine()) != null) {
                 queueOfSymbols.put(line);
             }
-        } catch (IOException e) {
-            System.err.println("IOException: " + e);
-        } catch (InterruptedException e) {
-            System.err.println("InterruptedException: " + e);
+        } catch (Exception e) {
+            log.error(e);
         } finally {
             try {
                 // Add a POISON_PILL
@@ -38,7 +38,7 @@ public class Producer implements Runnable {
                 bufferedReader.close();
                 fileReader.close();
             } catch (Exception e) {
-                e.fillInStackTrace();
+                log.error(e);
             }
         }
     }

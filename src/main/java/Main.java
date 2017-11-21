@@ -1,7 +1,9 @@
+import org.apache.log4j.Logger;
 import workers.DrawerWorker;
 import workers.ExecutorWorker;
 
 public class Main {
+    private static final Logger log = Logger.getLogger(Main.class);
     public static void main(String[] args) {
         // Check command line parameters
         if (args.length == 0) {
@@ -15,7 +17,7 @@ public class Main {
             executorWorker.start();
             DrawerWorker.draw(executorWorker.getCountOfCharsMap(), executorWorker.getSymbolsCount().longValue());
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            log.error(e);
         }
     }
 }

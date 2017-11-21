@@ -1,11 +1,14 @@
 package workers;
 
+import org.apache.log4j.Logger;
+
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class DrawerWorker {
+    private static final Logger log = Logger.getLogger(DrawerWorker.class);
     public static void draw(ConcurrentHashMap<Character, AtomicInteger> countOfCharsMap, long symbolsCount) {
         try {
             final TreeMap<Character, AtomicInteger> sortedHashMap = new TreeMap<Character, AtomicInteger>(countOfCharsMap);
@@ -31,8 +34,7 @@ public class DrawerWorker {
                 System.out.println("");
             }
         } catch (Exception e) {
-            // If exception occurred: log it in logger
-            System.err.println("Histogram drawing exception: " + e);
+            log.error(e);
         }
     }
 }
