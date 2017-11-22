@@ -15,9 +15,10 @@ public class Main {
         final ExecutorWorker executorWorker = new ExecutorWorker(args[0]);
         try {
             executorWorker.start();
-            DrawerWorker.draw(executorWorker.getCountOfCharsMap(), executorWorker.getSymbolsCount().longValue());
+            DrawerWorker.draw(executorWorker.getCountOfCharsMap(), executorWorker.getSymbolsCount());
         } catch (Exception e) {
             log.error(e);
+            e.printStackTrace();
         }
     }
 }

@@ -15,13 +15,13 @@ public class ExecutorWorker {
     private final String filePath;
     private final ExecutorService readerService = Executors.newSingleThreadExecutor();
     private final ExecutorService symbolsAnalyzer = Executors.newFixedThreadPool(ExecutorWorker.availableProcessors);
-    private AtomicInteger symbolsCount = new AtomicInteger(0);
+    private long symbolsCount = 0;
 
     public ExecutorWorker(String filename) {
         this.filePath = filename;
     }
 
-    public AtomicInteger getSymbolsCount() {
+    public long getSymbolsCount() {
         return symbolsCount;
     }
 
@@ -34,24 +34,20 @@ public class ExecutorWorker {
         if (!file.canRead()) {
             throw new IOException("Can't opening file for reading!");
         }
-
         final Producer producer = new Producer(this.queueOfSymbols, this.filePath);
-        final Consumer consumer = new Consumer(this.queueOfSymbols, this.countOfCharsMap);
-        final List<Future<AtomicInteger>> workerList = new ArrayList<Future<AtomicInteger>>();
-
+        final List<Future<Integer>> workerList = new ArrayList<Future<Integer>>();
         readerService.submit(producer);
+
         for (int i = 0; i < ExecutorWorker.availableProcessors; i++) {
-            Future<AtomicInteger> worker = symbolsAnalyzer.submit(consumer);
+            final Consumer consumer = new Consumer(this.queueOfSymbols, this.countOfCharsMap);
+            Future<Integer> worker = symbolsAnalyzer.submit(consumer);
             workerList.add(worker);
         }
 
-        for (Future<AtomicInteger> future: workerList) {
-            try {
-                 symbolsCount = future.get();
-            } finally {
-                readerService.shutdown();
-                symbolsAnalyzer.shutdown();
-            }
+        for (Future<Integer> future: workerList) {
+            symbolsCount += future.get();
         }
+        readerService.shutdown();
+        symbolsAnalyzer.shutdown();
     }
 }
