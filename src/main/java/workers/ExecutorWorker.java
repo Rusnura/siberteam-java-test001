@@ -9,20 +9,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ExecutorWorker {
     public static int availableProcessors = Runtime.getRuntime().availableProcessors();
-    public static final String POISON_PILL = new String(); // Add it to queue end
-    private final BlockingQueue<String> queueOfSymbols = new ArrayBlockingQueue<String>(10);
+    private final BlockingQueue<String> queueOfSymbols = new ArrayBlockingQueue<String>(5);
     private final ConcurrentHashMap<Character, AtomicInteger> countOfCharsMap = new ConcurrentHashMap<Character, AtomicInteger>(); // ConcurrentHashMap: <Symbol, CountOfSymbols>
     private final String filePath;
     private final ExecutorService readerService = Executors.newSingleThreadExecutor();
     private final ExecutorService symbolsAnalyzer = Executors.newFixedThreadPool(ExecutorWorker.availableProcessors);
-    private long symbolsCount = 0;
 
     public ExecutorWorker(String filename) {
         this.filePath = filename;
-    }
-
-    public long getSymbolsCount() {
-        return symbolsCount;
     }
 
     public ConcurrentHashMap<Character, AtomicInteger> getCountOfCharsMap() {
@@ -34,20 +28,33 @@ public class ExecutorWorker {
         if (!file.canRead()) {
             throw new IOException("Can't opening file for reading!");
         }
+
         final Producer producer = new Producer(this.queueOfSymbols, this.filePath);
-        final List<Future<Integer>> workerList = new ArrayList<Future<Integer>>();
-        readerService.submit(producer);
+        Future readerWorker = readerService.submit(producer);
 
-        for (int i = 0; i < ExecutorWorker.availableProcessors; i++) {
-            final Consumer consumer = new Consumer(this.queueOfSymbols, this.countOfCharsMap);
-            Future<Integer> worker = symbolsAnalyzer.submit(consumer);
-            workerList.add(worker);
-        }
+        do {
+            analyze();
+        } while (!readerWorker.isDone());
 
-        for (Future<Integer> future: workerList) {
-            symbolsCount += future.get();
-        }
+        // Verify
+        analyze();
+
+        // All is done - we can shutdown executors
         readerService.shutdown();
         symbolsAnalyzer.shutdown();
+    }
+
+    private void analyze() throws Exception {
+        final List<Future> workerList = new ArrayList<Future>();
+        for (int i = 0; i < ExecutorWorker.availableProcessors; i++) {
+            final Consumer consumer = new Consumer(this.queueOfSymbols, this.countOfCharsMap);
+            Future worker = symbolsAnalyzer.submit(consumer);
+            workerList.add(worker);
+
+            // wait all threads
+            for (Future future: workerList) {
+                future.get();
+            }
+        }
     }
 }

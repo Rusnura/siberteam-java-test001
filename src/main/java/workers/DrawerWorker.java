@@ -9,15 +9,22 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class DrawerWorker {
     private static final Logger log = Logger.getLogger(DrawerWorker.class);
-    public static void draw(ConcurrentHashMap<Character, AtomicInteger> countOfCharsMap, long symbolsCount) {
+
+    public static void draw(ConcurrentHashMap<Character, AtomicInteger> countOfCharsMap) {
         try {
             final TreeMap<Character, AtomicInteger> sortedHashMap = new TreeMap<Character, AtomicInteger>(countOfCharsMap);
+            // Calculate the total symbols count
+            long totalSymbolsCount = 0;
+            for (Map.Entry<Character, AtomicInteger> entry : sortedHashMap.entrySet()) {
+                totalSymbolsCount += entry.getValue().longValue();
+            }
+
             // Loop gets entry from map
             for (Map.Entry<Character, AtomicInteger> entry : sortedHashMap.entrySet()) {
                 char symbol = entry.getKey();
                 int count = entry.getValue().get();
                 // Calculate the percent of symbols: CountOfSymbol / TotalCountOfSymbolsInText * 100
-                float frequency = (count / (float) symbolsCount) * 100;
+                float frequency = (count / (float) totalSymbolsCount) * 100;
 
                 // Calculate sharp (#) count: frequency / 2
                 // Maximum count of sharps: 50

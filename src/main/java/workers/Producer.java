@@ -24,17 +24,13 @@ public class Producer implements Runnable {
             fileReader = new FileReader(filePath);
             bufferedReader = new BufferedReader(fileReader);
             String line;
-            while ((line = bufferedReader.readLine()) != null) {
+            while ((line = bufferedReader.readLine()) != null ) {
                 queueOfSymbols.put(line);
             }
         } catch (Exception e) {
             log.error(e);
         } finally {
             try {
-                // Add a POISON_PILL
-                for (int i = 0; i < ExecutorWorker.availableProcessors; i++) {
-                    queueOfSymbols.put(ExecutorWorker.POISON_PILL);
-                }
                 bufferedReader.close();
                 fileReader.close();
             } catch (Exception e) {
