@@ -1,9 +1,11 @@
 package workers;
 
 import org.apache.log4j.Logger;
+import services.Indicator;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 
 public class Producer implements Runnable {
@@ -12,10 +14,12 @@ public class Producer implements Runnable {
     private final String filePath;
     private BufferedReader bufferedReader;
     private FileReader fileReader;
+    private Indicator indicator;
 
-    public Producer(BlockingQueue<String> q, String filePath) {
+    public Producer(BlockingQueue<String> q, String filePath, Indicator indicator) {
         this.queueOfSymbols = q;
         this.filePath = filePath;
+        this.indicator = indicator;
     }
 
     @Override
@@ -26,6 +30,7 @@ public class Producer implements Runnable {
             String line;
             while ((line = bufferedReader.readLine()) != null ) {
                 queueOfSymbols.put(line);
+                System.out.println("Ok");
             }
         } catch (Exception e) {
             log.error(e);
@@ -36,6 +41,7 @@ public class Producer implements Runnable {
             } catch (Exception e) {
                 log.error(e);
             }
+            this.indicator.setIsDone();
         }
     }
 }
