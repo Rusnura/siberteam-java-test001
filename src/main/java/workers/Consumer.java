@@ -1,20 +1,20 @@
 package workers;
 
 import org.apache.log4j.Logger;
-import services.Indicator;
+import services.IDone;
 
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Consumer implements Runnable {
     private static final Logger log = Logger.getLogger(Consumer.class);
     private final BlockingQueue<String> queueOfSymbols;
-    private final ConcurrentHashMap<Character, AtomicInteger> countOfCharsMap;
-    private final Indicator indicator;
+    private final ConcurrentMap<Character, AtomicInteger> countOfCharsMap;
+    private final IDone indicator;
 
-    public Consumer(BlockingQueue<String> q, ConcurrentHashMap<Character, AtomicInteger> countOfCharsMap, Indicator indicator) {
+    public Consumer(BlockingQueue<String> q, ConcurrentMap<Character, AtomicInteger> countOfCharsMap, IDone indicator) {
         this.queueOfSymbols = q;
         this.countOfCharsMap = countOfCharsMap;
         this.indicator = indicator;
