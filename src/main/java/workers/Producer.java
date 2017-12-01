@@ -14,6 +14,7 @@ public class Producer implements Runnable, IDone {
     private final String filePath;
     private BufferedReader bufferedReader;
     private FileReader fileReader;
+    private boolean isDone = false;
 
     public Producer(BlockingQueue<String> q, String filePath) {
         this.queueOfSymbols = q;
@@ -21,7 +22,7 @@ public class Producer implements Runnable, IDone {
     }
 
     @Override
-    public AtomicBoolean getIsDone() {
+    public boolean getIsDone() {
         return isDone;
     }
 
@@ -43,7 +44,7 @@ public class Producer implements Runnable, IDone {
             } catch (Exception e) {
                 log.error(e);
             }
-            isDone.set(true);
+            isDone = true;
         }
     }
 }

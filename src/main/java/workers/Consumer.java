@@ -24,7 +24,7 @@ public class Consumer implements Runnable {
     public void run() {
         String line;
         try {
-            while (!this.indicator.getIsDone().get()) {
+            while (!this.indicator.getIsDone()) {
             /*
              * For each symbol:
              * if symbol isn't exists in map: add it with 1 count
